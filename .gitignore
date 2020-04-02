@@ -1,0 +1,11 @@
+### intellij ###
+.idea
+
+### VS Code ###
+.vscode
+
+### windows ###
+*.exe
+
+### macOS ###
+*.DS_Store
