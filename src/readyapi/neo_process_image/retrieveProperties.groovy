@@ -17,21 +17,22 @@ void retrieveProperties() {
     String processId = testRunner.testCase.getPropertyValue("processId")?.trim()?.toLowerCase()
     testRunner.testCase.testSteps["Properties"].setPropertyValue("processId", processId ? processId : "com.airbus.massive.ortho")
 
+    String catalogId = context.expand('${#TestCase#catalogId}')
+    String workspace = context.expand('${#TestCase#workspace}')
     String executionOrder = testRunner.testCase.getPropertyValue("executionOrder")?.trim()
     if (executionOrder) {
         testRunner.testCase.testSteps["Properties"].setPropertyValue("geometry", null)
+        executionOrder = executionOrder.replaceFirst("\"catalogId\"\\s*:\\s*\"[^\\s\"]*\"", "\"catalogId\":\"${catalogId}\"")
+                .replaceFirst("\"workspace\"\\s*:\\s*\"[^\\s\"]*\"", "\"workspace\":\"${workspace}\"")
     } else {
         String geometry = context.expand('${#TestCase#geometry}')?.trim()
         if (!checkIsValidGeometryPayload(geometry)) {
             String geometryFormat = geometry ==~ "(tiny)|(very-tiny)" ? geometry : 'tiny'
-            String catalogGeometry = context.expand( '${Properties#catalogGeometry}' )
+            String catalogGeometry = context.expand('${Properties#catalogGeometry}')
             geometry = computeGeometryPayload(geometryFormat, catalogGeometry)
         }
         log.info(geometry)
         testRunner.testCase.testSteps["Properties"].setPropertyValue("geometry", geometry)
-
-        String catalogId = context.expand( '${#TestCase#catalogId}' )
-        String workspace = context.expand( '${#TestCase#workspace}' )
         executionOrder = computeExecutionOrder(catalogId, workspace, geometry)
     }
     testRunner.testCase.testSteps["Properties"].setPropertyValue("executionOrder", executionOrder)
@@ -73,12 +74,12 @@ String computeGeometryPayload(String geometryFormat, String catalogGeometry) thr
         case "tiny":
             log.info("geometry will be reduced to a small square at the center of the image")
             lengthSquare = 0.005
-            halfLength = lengthSquare/2
+            halfLength = lengthSquare / 2
             break
         case "very-tiny":
             log.info("geometry will be reduced to a very-small square at the center of the image")
             lengthSquare = 0.0001
-            halfLength = lengthSquare/2
+            halfLength = lengthSquare / 2
             break
         default:
             log.error("Unexpected geometry format: [$geometryFormat]")
@@ -88,11 +89,11 @@ String computeGeometryPayload(String geometryFormat, String catalogGeometry) thr
     geometry = new JsonSlurper().parseText(catalogGeometry)
     ArrayList centroid = getCentroid(geometry)
     geometry["coordinates"][0] = [
-            [centroid[0]-halfLength,centroid[1]-halfLength],
-            [centroid[0]+halfLength,centroid[1]-halfLength],
-            [centroid[0]+halfLength,centroid[1]+halfLength],
-            [centroid[0]-halfLength,centroid[1]+halfLength],
-            [centroid[0]-halfLength,centroid[1]-halfLength],
+            [centroid[0] - halfLength, centroid[1] - halfLength],
+            [centroid[0] + halfLength, centroid[1] - halfLength],
+            [centroid[0] + halfLength, centroid[1] + halfLength],
+            [centroid[0] - halfLength, centroid[1] + halfLength],
+            [centroid[0] - halfLength, centroid[1] - halfLength],
     ]
     return groovy.json.JsonOutput.toJson(geometry)
 }
@@ -103,21 +104,21 @@ ArrayList getCentroid(geometry) {
     BigDecimal centroidY = 0
     ArrayList points = geometry["coordinates"][0]
     Integer size = points.size() - 1
-    for (def i = 0; i < size ; i++) {
-        centroidX += (points[i][0]+points[i+1][0])*(points[i][0]*points[i+1][1]-points[i+1][0]*points[i][1])
-        centroidY += (points[i][1]+points[i+1][1])*(points[i][0]*points[i+1][1]-points[i+1][0]*points[i][1])
+    for (def i = 0; i < size; i++) {
+        centroidX += (points[i][0] + points[i + 1][0]) * (points[i][0] * points[i + 1][1] - points[i + 1][0] * points[i][1])
+        centroidY += (points[i][1] + points[i + 1][1]) * (points[i][0] * points[i + 1][1] - points[i + 1][0] * points[i][1])
     }
-    return [centroidX/(6*area),centroidY/(6*area)]
+    return [centroidX / (6 * area), centroidY / (6 * area)]
 }
 
 BigDecimal getArea(geometry) {
     BigDecimal area = 0
     ArrayList points = geometry["coordinates"][0]
     Integer size = points.size() - 1
-    for (def i = 0; i < size ; i++) {
-        area += points[i][0]*points[i+1][1]-points[i+1][0]*points[i][1]
+    for (def i = 0; i < size; i++) {
+        area += points[i][0] * points[i + 1][1] - points[i + 1][0] * points[i][1]
     }
-    return area/2
+    return area / 2
 }
 
 String computeExecutionOrder(String catalogId, String workspace, String geometry) {
