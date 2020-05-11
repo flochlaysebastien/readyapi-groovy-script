@@ -50,6 +50,6 @@ void retrieveTestChoices() {
     testRunner.testCase.testSteps["Properties"].setPropertyValue("checkDownload", isNativeCopy.toString())
     testRunner.testCase.testSteps["Properties"].setPropertyValue("checkDownloadLinkAbsence", (!isNativeCopy).toString())
 
-    String correlationID = testRunner.testCase.getPropertyValue("correlationID")?.trim()?.toLowerCase()
+    String correlationID = testRunner.testCase.getPropertyValue("correlationID")?.trim()
     testRunner.testCase.testSteps["Properties"].setPropertyValue("checkCorrelationID", correlationID ? 'true' : 'false')
 }

@@ -73,7 +73,7 @@ void retrieveTestChoices() {
     String catalogLink = testRunner.testCase.getPropertyValue("catalogLink")?.trim()?.toLowerCase()
     testRunner.testCase.testSteps["Properties"].setPropertyValue("checkDownloadLinks", catalogLink ? 'true' : 'false')
 
-    String correlationID = testRunner.testCase.getPropertyValue("correlationID")?.trim()?.toLowerCase()
+    String correlationID = testRunner.testCase.getPropertyValue("correlationID")?.trim()
     testRunner.testCase.testSteps["Properties"].setPropertyValue("checkCorrelationID", correlationID ? 'true' : 'false')
 }
 

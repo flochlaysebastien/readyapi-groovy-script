@@ -52,7 +52,7 @@ void retrieveTestChoices() {
     String checkQuicklookThumbnail = testRunner.testCase.getPropertyValue("checkQuicklookThumbnail")?.trim()?.toLowerCase()
     testRunner.testCase.testSteps["Properties"].setPropertyValue("checkQuicklookThumbnail", checkQuicklookThumbnail ==~ "(yes)|(true)" ? 'true' : 'false')
 
-    String correlationID = testRunner.testCase.getPropertyValue("correlationID")?.trim()?.toLowerCase()
+    String correlationID = testRunner.testCase.getPropertyValue("correlationID")?.trim()
     testRunner.testCase.testSteps["Properties"].setPropertyValue("checkCorrelationID", correlationID ? 'true' : 'false')
 }
 
