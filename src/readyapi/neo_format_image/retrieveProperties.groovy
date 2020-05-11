@@ -70,6 +70,9 @@ void retrieveProperties() {
 }
 
 void retrieveTestChoices() {
+    String referenceFilePath = testRunner.testCase.getPropertyValue("referenceFilePath")?.trim()
+    testRunner.testCase.testSteps["Properties"].setPropertyValue("checkImageResult", referenceFilePath ? 'true' : 'false')
+
     String catalogLink = testRunner.testCase.getPropertyValue("catalogLink")?.trim()?.toLowerCase()
     testRunner.testCase.testSteps["Properties"].setPropertyValue("checkDownloadLinks", catalogLink ? 'true' : 'false')
 

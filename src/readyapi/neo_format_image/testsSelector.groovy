@@ -2,8 +2,11 @@ package readyapi.neo_format_image
 
 try {
     log.info("Format image tests selector:")
-    log.info("    - Check image result [automatic]")
-    testRunner.runTestStepByName("Check image result")
+
+    if (context.expand('${Properties#checkImageResult}').toBoolean()) {
+        log.info("    - Check image result [required]")
+        testRunner.runTestStepByName("Check image result")
+    }
 
     if (context.expand('${Properties#checkFormatParameters}').toBoolean()) {
         log.info("    - Check format parameters [required]")
