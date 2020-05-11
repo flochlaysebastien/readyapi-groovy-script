@@ -25,7 +25,7 @@ void retrieveProperties() {
     testRunner.testCase.testSteps["Properties"].setPropertyValue("forceDaasLight", forceDaasLight ==~ "(yes)|(true)" ? 'true' : null)
 
     String metadata = testRunner.testCase.getPropertyValue("metadata")?.trim()
-    testRunner.testCase.testSteps["Properties"].setPropertyValue("metadata", metadata ? metadata : "{}")
+    testRunner.testCase.testSteps["Properties"].setPropertyValue("metadata", metadata ? metadata : "null")
 
     String properties = testRunner.testCase.getPropertyValue("properties")?.trim()
     testRunner.testCase.testSteps["Properties"].setPropertyValue("properties", properties ? properties : "{}")
