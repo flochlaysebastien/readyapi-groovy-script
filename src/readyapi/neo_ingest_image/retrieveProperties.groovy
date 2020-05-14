@@ -40,8 +40,11 @@ void retrieveProperties() {
 }
 
 void retrieveTestChoices() {
-    String checkStreaming = testRunner.testCase.getPropertyValue("checkStreaming")?.trim()?.toLowerCase()
-    testRunner.testCase.testSteps["Properties"].setPropertyValue("checkStreaming", checkStreaming ==~ "(yes)|(true)" ? 'true' : 'false')
+    Boolean isStreamingRequired = testRunner.testCase.getPropertyValue("checkStreaming")?.trim()?.toLowerCase() ==~ "(yes)|(true)"
+    Boolean isOrtho = context.expand('${Properties#isOrtho}').toBoolean()
+    Boolean isOptimizePerformance = context.expand('${Properties#optimize}') ==~ "performance"
+    String checkStreaming = isStreamingRequired && (isOrtho || isOptimizePerformance) ? 'true' : 'false'
+    testRunner.testCase.testSteps["Properties"].setPropertyValue("checkStreaming", checkStreaming)
 
     String checkQuicklookThumbnail = testRunner.testCase.getPropertyValue("checkQuicklookThumbnail")?.trim()?.toLowerCase()
     testRunner.testCase.testSteps["Properties"].setPropertyValue("checkQuicklookThumbnail", checkQuicklookThumbnail ==~ "(yes)|(true)" ? 'true' : 'false')
