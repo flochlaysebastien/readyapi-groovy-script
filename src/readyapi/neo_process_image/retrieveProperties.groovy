@@ -15,7 +15,8 @@ void retrieveProperties() {
     testRunner.testCase.testSteps["Properties"].setPropertyValue("priority", priority ? priority : "42")
 
     String processId = testRunner.testCase.getPropertyValue("processId")?.trim()?.toLowerCase()
-    testRunner.testCase.testSteps["Properties"].setPropertyValue("processId", processId ? processId : "com.airbus.massive.ortho")
+    processId = processId ? processId : "com.airbus.massive.ortho.v3"
+    testRunner.testCase.testSteps["Properties"].setPropertyValue("processId", processId)
 
     String catalogId = context.expand('${#TestCase#catalogId}')
     String workspace = context.expand('${#TestCase#workspace}')
@@ -33,7 +34,7 @@ void retrieveProperties() {
         }
         log.info(geometry)
         testRunner.testCase.testSteps["Properties"].setPropertyValue("geometry", geometry)
-        executionOrder = computeExecutionOrder(catalogId, workspace, geometry)
+        executionOrder = computeExecutionOrder(processId, catalogId, workspace, geometry)
     }
     testRunner.testCase.testSteps["Properties"].setPropertyValue("executionOrder", executionOrder)
 
@@ -121,36 +122,122 @@ BigDecimal getArea(geometry) {
     return area / 2
 }
 
-String computeExecutionOrder(String catalogId, String workspace, String geometry) {
-    String executionOrder = """{
-   "catalogId":"${catalogId}",
-   "workspace":"${workspace}",
-   "AOI":{
-      "type":"Feature",
-      "properties":{
-         "crsCode":"urn:ogc:def:crs:EPSG::4326"
-      },
-      "geometry":${geometry}
-   },
-   "DEMType":"MIXEDDEM",
-   "tilingSize":2048,
-   "outCRS":"urn:ogc:def:crs:EPSG::4326",
-   "outputStep":{
-      "x":0.00000462962963,
-      "y":0.00000462962963
-   },
-   "lengthSegmentMax":0.01,
-   "optimize":"performance",
-   "pansharpened":false,
-   "greyWeights":{
-      "B0":0.251,
-      "B1":0.313,
-      "B2":0.367,
-      "B3":0.057
-   },
-   "footprintMargin":0,
-   "resamplingMethod":"BICUBIC",
-   "radiometricProcessing":"REFLECTANCE"
+String computeExecutionOrder(String processId, String catalogId, String workspace, String geometry) {
+    String executionOrder
+    switch (processId) {
+        case "com.airbus.massive.ortho":
+            executionOrder = """{
+    "catalogId": "${catalogId}",
+    "workspace": "${workspace}",
+    "AOI": {
+        "type": "Feature",
+        "properties": {
+            "crsCode": "urn:ogc:def:crs:EPSG::4326"
+        },
+        "geometry":${geometry}
+    },
+    "DEMType": "MIXEDDEM",
+    "tilingSize": 2048,
+    "outCRS": "urn:ogc:def:crs:EPSG::4326",
+    "outputStep": {
+        "x": 0.00000462962963,
+        "y": 0.00000462962963
+    },
+    "lengthSegmentMax": 0.01,
+    "optimize": "performance",
+    "pansharpened": false,
+    "greyWeights": {
+        "B0": 0.251,
+        "B1": 0.313,
+        "B2": 0.367,
+        "B3": 0.057
+    },
+    "footprintMargin": 0,
+    "resamplingMethod": "BICUBIC",
+    "radiometricProcessing": "REFLECTANCE"
 }"""
+            break
+        case "com.airbus.massive.ortho.v2":
+            executionOrder = """{
+    "catalogId": "${catalogId}",
+    "workspace": "${workspace}",
+    "AOI": {
+        "type": "Feature",
+        "properties": {
+            "crsCode": "urn:ogc:def:crs:EPSG::4326"
+        },
+        "geometry":${geometry}
+    },
+    "commercialReference": "ORTHO PMS DISPLAY JPEG2000 3857 NE",
+    "customerReference": "ORTHO PMS DISPLAY JPEG2000 3857 NE",
+    "comment": "com.airbus.massive.ortho.v2",
+    "outputStep": {
+        "x": 0.5,
+        "y": 0.5
+    },
+    "DEMType": "MIXEDDEM",
+    "tilingSize": 2048,
+    "outCRS": "urn:ogc:def:crs:EPSG::3857",
+    "lengthSegmentMax": 0.01,
+    "optimize": "performance",
+    "productType": "PMS",
+    "greyWeights": {
+        "B0": 0.148,
+        "B1": 0.334,
+        "B2": 0.487,
+        "B3": 0.051
+    },
+    "footprintMargin": 0,
+    "radiometricProcessing": "DISPLAY",
+    "resamplingMethod": "BICUBIC"
+}"""
+            break
+        case "com.airbus.massive.ortho.v3":
+            executionOrder = """{
+    "catalogId": "${catalogId}",
+    "workspace": "${workspace}",
+    "AOI": {
+        "type": "Feature",
+        "properties": {
+            "crsCode": "urn:ogc:def:crs:EPSG::4326"
+        },
+        "geometry":${geometry}
+    },
+    "outputStep": {
+        "x": 0.5,
+        "y": 0.5
+    },
+    "orderIdentification": {
+        "commercialReference": "ORTHO PMS DISPLAY JPEG2000 3857 NE",
+        "customerReference": "ORTHO PMS DISPLAY JPEG2000 3857 NE",
+        "comment": "com.airbus.massive.ortho.v3"
+    },
+    "DEMType": "MIXEDDEM",
+    "tilingSize": 2048,
+    "outputSRS": {
+        "type": "urn",
+        "value": "urn:ogc:def:crs:EPSG::3857"
+    },
+    "lengthSegmentMax": 0.01,
+    "optimize": "performance",
+    "productType": "PMS",
+    "greyWeights": {
+        "B0": 0.148,
+        "B1": 0.334,
+        "B2": 0.487,
+        "B3": 0.051
+    },
+    "footprintMargin": 0,
+    "radiometricProcessing": "DISPLAY",
+    "resamplingMethod": "BICUBIC",
+    "resamplingPMS": "BICUBIC",
+    "resamplingOrtho": "BICUBIC"
+}"""
+            break
+        default:
+            log.error("Unexpected processId format: [$processId]")
+            throw new Exception("Unexpected processId")
+    }
+
     return executionOrder
 }
