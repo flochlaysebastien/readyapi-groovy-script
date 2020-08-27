@@ -1,6 +1,6 @@
 package readyapi.neo_format_image
 
-import org.apache.logging.log4j.core.Logger
+//import org.apache.logging.log4j.core.Logger
 import com.google.auth.oauth2.AccessToken
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.common.base.Strings
@@ -77,13 +77,13 @@ class LogUtils {
     public static String processStepsNumber
     public static String stepDescription
     public static String stepID
-    public static Logger log
+//    public static Logger log
 
     public static void setProcess(String id, String description, String stepsNumber) {
         processDescription = description
         processID = id
         processStepsNumber = stepsNumber
-        this.log.info("$processID - $processDescription:")
+        this.log.info("        $processID - $processDescription:")
     }
 
     public static void setStep(String id, String description) {
@@ -93,7 +93,7 @@ class LogUtils {
 
     public static void print(Boolean succeed = true) {
         String result = succeed ? 'succeed' : 'failed'
-        this.log.info("    [$stepID/$processStepsNumber] $stepDescription ($result)")
+        this.log.info("            [$stepID/$processStepsNumber] $stepDescription ($result)")
     }
 
     public static void fail(String message) {
@@ -102,8 +102,8 @@ class LogUtils {
     }
 
     public static void done() {
-        this.log.info("    ==========")
-        this.log.info("    Done")
+        this.log.info("            ==========")
+        this.log.info("            [format] Done")
     }
 }
 

@@ -3,12 +3,21 @@ package readyapi
 import groovy.json.JsonSlurper
 
 try {
+    logStepName()
     generateName()
     generateTitle()
     generateLabelList()
 } catch (Exception ex) {
     log.error(ex.getMessage())
     testRunner.fail("Failed to prepare data for workspace creation")
+}
+
+void logStepName() {
+    log.info("")
+    log.info("#########################")
+    log.info("####  create workspace")
+    log.info("#########################")
+    log.info("")
 }
 
 /*
@@ -41,7 +50,7 @@ void generateName() throws Exception {
 void generateTitle() throws Exception {
     title = testRunner.testCase.getPropertyValue("title")
     if (!title?.trim()) {
-        title = "${context.expand( '${Properties#workspaceName}' )} title"
+        title = "Title for ${context.expand('${Properties#workspaceName}')}"
     }
 
     testRunner.testCase.testSteps["Properties"].setPropertyValue("workspaceTitle", title)

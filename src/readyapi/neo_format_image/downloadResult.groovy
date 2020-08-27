@@ -1,5 +1,8 @@
 package readyapi.neo_format_image
 
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+
 /*
 String catalogID = "89b21a6d-ac35-44f3-b07b-fa2b54c3cebd"
 String formatDownloadURL = "https://view-qual.idp.private.geoapi-airbusds.com/api/v1/items/89b21a6d-ac35-44f3-b07b-fa2b54c3cebd/download"
@@ -14,5 +17,50 @@ String gcpserviceaccount = "eyAgICJ0eXBlIjogInNlcnZpY2VfYWNjb3VudCIsICAgInByb2pl
 //    String apikey = context.expand('${#Global#apikey.' + userName + '}')
 //    String gcpserviceaccount = context.expand('${gcp.serviceaccount}')
 */
- */
 
+String formatDownloadURL = "https://view-int.idp.private.geoapi-airbusds.com/api/v1/items/1222938c-703e-447a-813e-25c0c40d27de/download"
+String targetDirectory = "/home/sebastien/Downloads/Format/snowy"
+String apikey = "O2F7dUsNpfBje5sB0wIg95rNQIykAes4q6KBFZtvAh5NVBfec9Vr8RJr1EH_14RKd5HyLM6ziCFeX68xRW1twQ=="
+
+try {
+    String authentication = "Basic " + ("APIKEY:" + apikey).bytes.encodeBase64().toString()
+    URL url = new URL(formatDownloadURL)
+    URLConnection connection = url.openConnection()
+    connection.setRequestProperty("Content-Type", "application/json")
+    connection.setRequestProperty("Authorization", authentication)
+    InputStream inputStream = connection.getInputStream()
+
+    ZipInputStream zipStream = new ZipInputStream(inputStream)
+    ZipEntry entry
+
+    while ((entry = zipStream.getNextEntry()) != null) {
+        extractEntry(entry.getName(), entry.isDirectory(), zipStream, targetDirectory)
+        zipStream.closeEntry()
+    }
+
+    zipStream.close()
+} catch (Exception ex) {
+    println(ex.getMessage())
+}
+
+void extractEntry(String name, Boolean isDirectory, FilterInputStream stream, String targetDirectory) throws IOException {
+    File entryFile = new File(targetDirectory, name)
+
+    if (isDirectory) {
+        mkdirsOrThrow(entryFile)
+        return
+    }
+
+    mkdirsOrThrow(entryFile.getParentFile())
+    FileOutputStream outputStream = new FileOutputStream(entryFile.path)
+    for (int c = stream.read(); c != -1; c = stream.read()) {
+        outputStream.write(c)
+    }
+    outputStream.close()
+}
+
+void mkdirsOrThrow(File dir) throws IOException {
+    if (!dir.exists() && !dir.mkdirs()) {
+        throw new IOException("Failed to create working directory. [$dir]")
+    }
+}

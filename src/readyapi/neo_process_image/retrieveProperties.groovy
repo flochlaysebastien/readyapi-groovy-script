@@ -3,11 +3,20 @@ package readyapi.neo_process_image
 import groovy.json.JsonSlurper
 
 try {
+    logStepName()
     retrieveProperties()
     retrieveTestChoices()
 } catch (Exception ex) {
     log.error(ex.getMessage())
     testRunner.fail("Failed to prepare data")
+}
+
+void logStepName() {
+    log.info("")
+    log.info("#########################")
+    log.info("####  process image")
+    log.info("#########################")
+    log.info("")
 }
 
 void retrieveProperties() {

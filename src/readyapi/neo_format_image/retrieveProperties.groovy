@@ -1,11 +1,20 @@
 package readyapi.neo_format_image
 
 try {
+    logStepName()
     retrieveProperties()
     retrieveTestChoices()
 } catch (Exception ex) {
     log.error(ex.getMessage())
     testRunner.fail("Failed to prepare data")
+}
+
+void logStepName() {
+    log.info("")
+    log.info("#########################")
+    log.info("####  format image")
+    log.info("#########################")
+    log.info("")
 }
 
 void retrieveProperties() {
